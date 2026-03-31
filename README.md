@@ -122,6 +122,30 @@ Fastify 接收参数并校验
 
 ## API 文档
 
+### GET /health
+
+服务健康检查接口，可用于容器探活、负载均衡检查或部署后的基础可用性验证。
+
+#### 示例请求
+
+```bash
+curl "http://localhost:3000/health"
+```
+
+#### 示例响应
+
+```json
+{
+  "code": 200,
+  "msg": "ok",
+  "data": {
+    "status": "up",
+    "service": "toPdf",
+    "timestamp": "2026-03-31T00:00:00.000Z"
+  }
+}
+```
+
 ### GET /toPdf
 
 将指定页面导出为 PDF。
@@ -166,7 +190,7 @@ Content-Disposition: attachment; filename="test.pdf"
 建议准备以下运行环境：
 
 - Node.js 18+
-- pnpm 10+
+- pnpm 10+（项目已在 `package.json` 中声明 `engines` 要求）
 - 可正常启动 Puppeteer 的 Linux / macOS 环境
 
 > 如果你希望减少本地浏览器环境差异，推荐优先使用 Docker 部署。

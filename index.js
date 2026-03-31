@@ -18,6 +18,18 @@ const { log } = app;
 const timeout = 60 * 1000;
 let requestTotalTime = 0;
 
+app.get("/health", async (_request, response) => {
+  return response.code(200).send({
+    code: 200,
+    msg: "ok",
+    data: {
+      status: "up",
+      service: "toPdf",
+      timestamp: new Date().toISOString(),
+    },
+  });
+});
+
 app.get("/toPdf", async (request, response) => {
   const { url, fileName = "doc" } = request.query;
 
@@ -58,6 +70,8 @@ app.get("/toPdf", async (request, response) => {
 
     // 开启请求拦截
     await page.setRequestInterception(true);
+
+    requestTotalTime = 0;
 
     // 定义response事件的回调函数
     const onResponse = (response) => {
