@@ -168,7 +168,6 @@ open "http://localhost:3000/debug"
 | fileName | string | 否 | 下载文件名，默认值为 `doc` |
 | scrollToBottom | boolean | 否 | 是否在导出前滚动到页面底部，适用于懒加载页面 |
 | headers | object | 否 | 额外请求头，会在页面请求时携带 |
-| cookies | array | 否 | 页面访问所需 Cookie 数组 |
 | timeout | number | 否 | 页面加载超时时间，单位毫秒，默认 `60000` |
 | enableRequestInterception | boolean | 否 | 是否启用内置资源拦截，默认 `true` |
 
@@ -184,13 +183,6 @@ curl -X POST "http://localhost:3000/toPdf" \
     "headers": {
       "Authorization": "Bearer xxx"
     },
-    "cookies": [
-      {
-        "name": "token",
-        "value": "xxx",
-        "url": "https://example.com"
-      }
-    ],
     "timeout": 60000,
     "enableRequestInterception": true
   }' \

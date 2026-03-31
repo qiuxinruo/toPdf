@@ -31,7 +31,6 @@ const getRequestOptions = (request) => {
       fileName: request.query.fileName || "doc",
       scrollToBottom: false,
       headers: {},
-      cookies: [],
       timeout: DEFAULT_TIMEOUT,
       enableRequestInterception: true,
     };
@@ -44,24 +43,12 @@ const getRequestOptions = (request) => {
     fileName: body.fileName || "doc",
     scrollToBottom: Boolean(body.scrollToBottom),
     headers: body.headers || {},
-    cookies: Array.isArray(body.cookies) ? body.cookies : [],
     timeout: Number(body.timeout) > 0 ? Number(body.timeout) : DEFAULT_TIMEOUT,
     enableRequestInterception:
       body.enableRequestInterception === undefined
         ? true
         : Boolean(body.enableRequestInterception),
   };
-};
-
-const validateCookies = (cookies) => {
-  return cookies.every(
-    (item) =>
-      item &&
-      typeof item.name === "string" &&
-      typeof item.value === "string" &&
-      (typeof item.url === "string" ||
-        (typeof item.domain === "string" && typeof item.path === "string"))
-  );
 };
 
 const sendBadRequest = (response, msg) => {
@@ -77,7 +64,6 @@ const renderPdf = async (options, response) => {
     fileName,
     scrollToBottom,
     headers,
-    cookies,
     timeout,
     enableRequestInterception,
   } = options;
@@ -92,17 +78,6 @@ const renderPdf = async (options, response) => {
     return sendBadRequest(response, "headers 必须是对象");
   }
 
-  if (!Array.isArray(cookies)) {
-    return sendBadRequest(response, "cookies 必须是数组");
-  }
-
-  if (!validateCookies(cookies)) {
-    return sendBadRequest(
-      response,
-      "cookies 格式不正确，需包含 name/value 和 url 或 domain+path"
-    );
-  }
-
   let page;
   const start = Date.now();
 
@@ -115,10 +90,6 @@ const renderPdf = async (options, response) => {
 
     if (headers && Object.keys(headers).length > 0) {
       await page.setExtraHTTPHeaders(headers);
-    }
-
-    if (cookies.length > 0) {
-      await page.setCookie(...cookies);
     }
 
     const promise1 = page.waitForNavigation({
@@ -270,10 +241,6 @@ app.get("/debug", async (_request, reply) => {
       <textarea id="headers" name="headers" rows="6" placeholder='{"Authorization":"Bearer xxx"}'></textarea>
       <div class="hint">请输入 JSON 对象格式。</div>
 
-      <label for="cookies">Cookies（JSON）</label>
-      <textarea id="cookies" name="cookies" rows="8" placeholder='[{"name":"token","value":"xxx","url":"https://example.com"}]'></textarea>
-      <div class="hint">请输入 JSON 数组，每项需包含 name/value 和 url 或 domain+path。</div>
-
       <div class="actions">
         <button type="submit">生成 PDF</button>
       </div>
@@ -289,7 +256,6 @@ app.get("/debug", async (_request, reply) => {
       const buildPayload = () => {
         const formData = new FormData(form);
         const headersText = formData.get("headers").trim();
-        const cookiesText = formData.get("cookies").trim();
 
         return {
           url: formData.get("url"),
@@ -298,7 +264,6 @@ app.get("/debug", async (_request, reply) => {
           scrollToBottom: formData.get("scrollToBottom") === "true",
           enableRequestInterception: formData.get("enableRequestInterception") === "true",
           headers: headersText ? JSON.parse(headersText) : {},
-          cookies: cookiesText ? JSON.parse(cookiesText) : [],
         };
       };
 
