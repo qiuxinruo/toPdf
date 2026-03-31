@@ -166,21 +166,28 @@ Content-Disposition: attachment; filename="test.pdf"
 建议准备以下运行环境：
 
 - Node.js 18+
-- npm 9+
+- pnpm 10+
 - 可正常启动 Puppeteer 的 Linux / macOS 环境
 
 > 如果你希望减少本地浏览器环境差异，推荐优先使用 Docker 部署。
+>
+> 若本地尚未安装 pnpm，可通过 Corepack 启用：
+>
+> ```bash
+> corepack enable
+> corepack prepare pnpm@10.12.1 --activate
+> ```
 
 ### 1. 安装依赖
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. 启动服务
 
 ```bash
-node index.js
+pnpm start
 ```
 
 默认监听地址：
@@ -202,8 +209,9 @@ curl -o output.pdf "http://localhost:3000/toPdf?url=https://example.com&fileName
 项目自带 `Dockerfile`，并在镜像中完成以下工作：
 
 - 使用 Puppeteer 运行基础镜像
-- 拷贝项目依赖描述文件
-- 安装项目依赖
+- 启用 Corepack 并激活 pnpm
+- 拷贝 `package.json` 与 `pnpm-lock.yaml`
+- 使用 pnpm 安装生产依赖
 - 复制中文字体到系统字体目录
 - 刷新字体缓存
 - 使用 `pm2-runtime` 启动服务
