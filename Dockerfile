@@ -13,6 +13,8 @@ USER root
 WORKDIR /app
 
 # 启用 pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@10.12.1 --activate
 
 # 将 package.json 和 pnpm-lock.yaml 复制到容器中

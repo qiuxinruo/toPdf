@@ -210,6 +210,7 @@ curl -o output.pdf "http://localhost:3000/toPdf?url=https://example.com&fileName
 
 - 使用 Puppeteer 运行基础镜像
 - 启用 Corepack 并激活 pnpm
+- 配置 `PNPM_HOME` 与全局可执行路径
 - 拷贝 `package.json` 与 `pnpm-lock.yaml`
 - 使用 pnpm 安装生产依赖
 - 复制中文字体到系统字体目录
