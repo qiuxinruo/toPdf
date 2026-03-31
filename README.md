@@ -317,6 +317,34 @@ make docker-down
 make logs
 ```
 
+## GitHub Actions
+
+项目已提供基础 CI 工作流：`.github/workflows/ci.yml`。
+
+该工作流会在以下场景自动执行：
+
+- push 到 `main`
+- 发起或更新 Pull Request
+
+当前 CI 包含两个检查任务：
+
+1. **Node service check**
+   - 安装 pnpm 与 Node.js
+   - 执行 `pnpm install --frozen-lockfile`
+   - 启动服务
+   - 检查 `/health` 接口是否可用
+
+2. **Docker build check**
+   - 执行 `docker build -t topdf .`
+   - 验证 Dockerfile 与构建流程是否正常
+
+这样可以在代码提交后尽早发现：
+
+- 依赖安装失败
+- 服务无法启动
+- 健康检查异常
+- Docker 镜像无法构建
+
 ## 示例
 
 ### 接口调用示例

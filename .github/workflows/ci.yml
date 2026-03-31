@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  node-check:
+    name: Node service check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start service
+        run: |
+          mkdir -p ./data/logs
+          PORT=3000 LOG_DIR=./data/logs pnpm start > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Wait for health endpoint
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Service failed to become healthy"
+          cat app.log
+          exit 1
+
+      - name: Stop service
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+          fi
+
+      - name: Show app log on failure
+        if: failure()
+        run: cat app.log
+
+  docker-build:
+    name: Docker build check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t topdf .
