@@ -193,6 +193,15 @@ Content-Disposition: attachment; filename="test.pdf"
 - pnpm 10+（项目已在 `package.json` 中声明 `engines` 要求）
 - 可正常启动 Puppeteer 的 Linux / macOS 环境
 
+### 环境变量
+
+| 变量名 | 默认值 | 说明 |
+| --- | --- | --- |
+| `PORT` | `3000` | 服务监听端口 |
+| `HOST` | `0.0.0.0` | 服务监听地址 |
+| `LOG_LEVEL` | `info` | Fastify 日志级别 |
+| `LOG_DIR` | `/data/logs` | 日志目录，日志文件名固定为 `topdf.log` |
+
 > 如果你希望减少本地浏览器环境差异，推荐优先使用 Docker 部署。
 >
 > 若本地尚未安装 pnpm，可通过 Corepack 启用：
@@ -212,6 +221,12 @@ pnpm install
 
 ```bash
 pnpm start
+```
+
+如需自定义日志目录，可在启动时传入环境变量：
+
+```bash
+LOG_DIR=./data/logs pnpm start
 ```
 
 默认监听地址：
@@ -257,6 +272,49 @@ docker run -p 3000:3000 topdf
 
 ```bash
 docker run -d --name topdf -p 3000:3000 topdf
+```
+
+## Docker Compose
+
+项目已提供 `docker-compose.yml`，用于快速启动服务与日志挂载。
+
+### 启动
+
+```bash
+docker compose up -d
+```
+
+### 停止
+
+```bash
+docker compose down
+```
+
+### 查看日志
+
+```bash
+docker compose logs -f topdf
+```
+
+Compose 默认会：
+
+- 暴露 `3000` 端口
+- 挂载本地 `./data/logs` 到容器 `/data/logs`
+- 配置健康检查调用 `/health`
+- 设置自动重启策略 `unless-stopped`
+
+## Makefile
+
+项目已提供常用命令封装，可直接执行：
+
+```bash
+make install
+make start
+make health
+make docker-build
+make docker-up
+make docker-down
+make logs
 ```
 
 ## 示例

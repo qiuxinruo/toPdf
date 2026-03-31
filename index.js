@@ -9,9 +9,15 @@ const transformOfficeContent = require("./public/transformOfficeContent.js");
 // const scrollPageToBottom = require("./public/scrollPageToBottom.js");
 const { skippedUrls, getBrowser } = require("./utils.js");
 
+const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || "0.0.0.0";
+const LOG_LEVEL = process.env.LOG_LEVEL || "info";
+const LOG_DIR = process.env.LOG_DIR || "/data/logs";
+const LOG_FILE = `${LOG_DIR}/topdf.log`;
+
 const app = fastify({
   // logger: true,
-  logger: { level: "info", file: "/data/logs/topdf.log" },
+  logger: { level: LOG_LEVEL, file: LOG_FILE },
 });
 
 const { log } = app;
@@ -168,11 +174,12 @@ app.get("/toPdf", async (request, response) => {
 });
 
 // 启动 Fastify 服务器
-app.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
+app.listen({ port: PORT, host: HOST }, (err, address) => {
   if (err) {
     log.error(`启动服务器时出现错误：${err}`);
     process.exit(1);
   }
 
   log.info(`Server is now listening on ${address}`);
+  log.info(`日志文件路径: ${LOG_FILE}`);
 });

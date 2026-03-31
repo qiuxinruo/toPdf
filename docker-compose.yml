@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  topdf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: topdf
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      LOG_LEVEL: info
+      LOG_DIR: /data/logs
+    volumes:
+      - ./data/logs:/data/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>{if(!r.ok) process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
